@@ -1,0 +1,19 @@
+@startuml despliegue
+title CI/CD y despliegue
+skinparam shadowing false
+
+actor Desarrollador as dev
+node "GitHub" {
+  [Repositorio] as repo
+  [GitHub Actions\nlint + pruebas + build] as ci
+  database "GHCR\nghcr.io/nico-alvz/..." as ghcr
+}
+node "Tu máquina o servidor" {
+  [Podman / Docker\nContainerfile] as motor
+}
+
+dev --> repo : git push (Conventional Commits)
+repo --> ci : dispara el flujo
+ci --> ghcr : publica la imagen (rama main)
+ghcr --> motor : podman pull / run
+@enduml

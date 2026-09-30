@@ -1,0 +1,35 @@
+@startuml hexagonal
+title Arquitectura hexagonal — CRUD de tareas
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+package "Adaptadores de entrada (quién nos llama)" {
+  [API REST FastAPI\napi_fastapi.py] as api
+}
+
+package "Núcleo de la aplicación" {
+  package "Aplicación" {
+    [ServicioTareas\n(casos de uso)] as servicio
+    interface "RepositorioTareas\n(puerto de salida)" as puerto
+  }
+  package "Dominio" {
+    [Tarea\n(entidad y reglas)] as tarea
+  }
+}
+
+package "Adaptadores de salida (a quién llamamos)" {
+  [RepositorioSQLite] as sqlite
+  [RepositorioMemoria] as memoria
+}
+
+api --> servicio : usa
+servicio --> tarea : crea y valida
+servicio --> puerto : depende de
+sqlite ..|> puerto : implementa
+memoria ..|> puerto : implementa
+
+note bottom of puerto
+  La flecha de dependencia siempre apunta
+  hacia el núcleo, nunca hacia afuera.
+end note
+@enduml

@@ -1,0 +1,22 @@
+@startuml secuencia_crear_tarea
+title Flujo de POST /tareas
+skinparam shadowing false
+
+actor Cliente
+participant "API FastAPI\n(adaptador de entrada)" as API
+participant "ServicioTareas\n(caso de uso)" as Servicio
+participant "Tarea\n(dominio)" as Tarea
+participant "RepositorioSQLite\n(adaptador de salida)" as Repo
+database "SQLite" as DB
+
+Cliente -> API : POST /tareas {"titulo": "..."}
+API -> Servicio : crear(titulo, descripcion)
+Servicio -> Tarea : Tarea(titulo, descripcion)
+Tarea --> Servicio : tarea válida (o TituloInvalido)
+Servicio -> Repo : guardar(tarea)
+Repo -> DB : INSERT INTO tareas
+DB --> Repo : id generado
+Repo --> Servicio : tarea con id
+Servicio --> API : tarea
+API --> Cliente : 201 Created + JSON
+@enduml
