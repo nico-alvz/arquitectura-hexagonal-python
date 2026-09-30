@@ -5,7 +5,7 @@ Esta clase orquesta la lógica de la aplicación. Solo conoce el *puerto*
 con un repositorio falso en memoria, sin levantar nada.
 """
 
-from tareas.aplicacion.puertos import RepositorioTareas
+from tareas.aplicacion.puertos import NotificadorTareas, RepositorioTareas
 from tareas.dominio.errores import TareaNoEncontrada
 from tareas.dominio.tarea import Tarea
 
@@ -13,9 +13,15 @@ from tareas.dominio.tarea import Tarea
 class ServicioTareas:
     """Operaciones CRUD sobre tareas."""
 
-    def __init__(self, repositorio: RepositorioTareas) -> None:
-        # Inyección de dependencias: nos entregan el repositorio ya construido.
+    def __init__(
+        self,
+        repositorio: RepositorioTareas,
+        notificador: NotificadorTareas | None = None,
+    ) -> None:
+        # Inyección de dependencias: nos entregan los puertos ya construidos.
+        # El notificador es opcional: sin él, simplemente no se avisa a nadie.
         self._repositorio = repositorio
+        self._notificador = notificador
 
     # C — Create
     def crear(self, titulo: str, descripcion: str = "") -> Tarea:
@@ -42,6 +48,7 @@ class ServicioTareas:
     ) -> Tarea:
         """Actualiza solo los campos recibidos (los `None` se dejan como estaban)."""
         tarea = self.obtener(tarea_id)
+        estaba_completada = tarea.completada
         if titulo is not None:
             Tarea.validar_titulo(titulo)
             tarea.titulo = titulo
@@ -49,7 +56,11 @@ class ServicioTareas:
             tarea.descripcion = descripcion
         if completada is not None:
             tarea.completada = completada
-        return self._repositorio.guardar(tarea)
+        guardada = self._repositorio.guardar(tarea)
+        # Regla de la aplicación: se avisa solo en la transición pendiente -> completada.
+        if guardada.completada and not estaba_completada and self._notificador:
+            self._notificador.tarea_completada(guardada)
+        return guardada
 
     # D — Delete
     def eliminar(self, tarea_id: int) -> None:
