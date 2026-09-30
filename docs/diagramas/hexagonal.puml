@@ -5,12 +5,14 @@ skinparam shadowing false
 
 package "Adaptadores de entrada (quién nos llama)" {
   [API REST FastAPI\napi_fastapi.py] as api
+  [Línea de comandos\ncli.py] as cli
 }
 
 package "Núcleo de la aplicación" {
   package "Aplicación" {
     [ServicioTareas\n(casos de uso)] as servicio
     interface "RepositorioTareas\n(puerto de salida)" as puerto
+    interface "NotificadorTareas\n(puerto de salida)" as notificador
   }
   package "Dominio" {
     [Tarea\n(entidad y reglas)] as tarea
@@ -20,13 +22,19 @@ package "Núcleo de la aplicación" {
 package "Adaptadores de salida (a quién llamamos)" {
   [RepositorioSQLite] as sqlite
   [RepositorioMemoria] as memoria
+  [RepositorioJSON] as json
+  [NotificadorConsola] as consola
 }
 
 api --> servicio : usa
+cli --> servicio : usa
 servicio --> tarea : crea y valida
 servicio --> puerto : depende de
+servicio --> notificador : depende de
 sqlite ..|> puerto : implementa
 memoria ..|> puerto : implementa
+json ..|> puerto : implementa
+consola ..|> notificador : implementa
 
 note bottom of puerto
   La flecha de dependencia siempre apunta

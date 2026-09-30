@@ -13,6 +13,7 @@ Un ejemplo **pequeño y muy comentado** de arquitectura hexagonal (puertos y ada
 - [Estructura del proyecto](#-estructura-del-proyecto)
 - [Inicio rápido](#-inicio-rápido)
 - [Uso de la API](#-uso-de-la-api)
+- [Cómo expandir](#-cómo-expandir)
 - [Pruebas](#-pruebas)
 - [CI/CD](#-cicd)
 - [Contribuir](#-contribuir)
@@ -73,15 +74,21 @@ src/tareas/
 │   ├── tarea.py              #   Entidad Tarea
 │   └── errores.py            #   Errores del negocio
 ├── aplicacion/               # Casos de uso
-│   ├── puertos.py            #   Interfaz RepositorioTareas
+│   ├── puertos.py            #   Contratos: RepositorioTareas y NotificadorTareas
 │   └── servicio_tareas.py    #   CRUD (crear, obtener, listar, actualizar, eliminar)
 ├── adaptadores/
 │   ├── entrada/
-│   │   └── api_fastapi.py    #   API REST (quien llama al núcleo)
+│   │   ├── api_fastapi.py    #   API REST (quien llama al núcleo)
+│   │   └── cli.py            #   Línea de comandos
 │   └── salida/
 │       ├── repositorio_memoria.py
-│       └── repositorio_sqlite.py
-└── principal.py              # Conecta todas las piezas
+│       ├── repositorio_sqlite.py
+│       ├── repositorio_json.py
+│       ├── notificador_consola.py
+│       └── notificador_memoria.py
+├── composicion.py            # Elige y conecta los adaptadores
+├── principal.py              # Arranque de la API
+└── principal_cli.py          # Arranque de la línea de comandos
 tests/                        # Pruebas unitarias y de integración
 Containerfile                 # Imagen (Podman y Docker)
 .github/workflows/ci.yml      # CI/CD
@@ -112,7 +119,7 @@ make ejecutar
 
 Abre <http://localhost:8000/docs> para probar la API desde el navegador.
 
-> Para usar memoria en vez de SQLite: `REPOSITORIO=memoria make ejecutar`.
+> Para cambiar de almacenamiento: `REPOSITORIO=memoria make ejecutar` o `REPOSITORIO=json make ejecutar`.
 
 ## 🔌 Uso de la API
 
@@ -133,6 +140,19 @@ curl -X PATCH localhost:8000/tareas/1 -H 'Content-Type: application/json' \
      -d '{"completada": true}'
 ```
 
+## 🔧 Cómo expandir
+
+¿Quieres agregar otra base de datos, otro aviso o una nueva forma de usar la app? Lee la **[guía para expandir](docs/como-extender.md)**. Incluye ejemplos reales de:
+
+- Un nuevo **adaptador de salida** (`RepositorioJSON`).
+- Un nuevo **puerto** (`NotificadorTareas`) con su adaptador.
+- Un nuevo **adaptador de entrada** (línea de comandos).
+- Pruebas de **contrato** que cualquier repositorio debe cumplir.
+
+```bash
+REPOSITORIO=json python -m tareas.principal_cli crear "Mi primera tarea"
+```
+
 ## ✅ Pruebas
 
 ```bash
@@ -142,6 +162,8 @@ make lint    # estilo (ruff)
 
 - `tests/test_servicio_tareas.py`: prueba el núcleo con el repositorio en memoria (sin HTTP ni SQL).
 - `tests/test_api.py`: prueba la API completa sobre SQLite.
+- `tests/test_contrato_repositorio.py`: la misma batería para **todos** los repositorios.
+- `tests/test_notificador.py` y `tests/test_cli.py`: el segundo puerto y el adaptador de consola.
 
 ## ⚙️ CI/CD
 
