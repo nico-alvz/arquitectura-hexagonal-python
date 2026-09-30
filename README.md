@@ -16,6 +16,7 @@ Un ejemplo **pequeño y muy comentado** de arquitectura hexagonal (puertos y ada
 - [Cómo expandir](#-cómo-expandir)
 - [Pruebas](#-pruebas)
 - [CI/CD](#-cicd)
+- [Referencias y créditos](#-referencias-y-créditos)
 - [Contribuir](#-contribuir)
 - [Licencia](#-licencia)
 
@@ -176,6 +177,14 @@ El flujo [`ci.yml`](.github/workflows/ci.yml) de GitHub Actions:
 ```bash
 podman run --rm -p 8000:8000 ghcr.io/nico-alvz/arquitectura-hexagonal-python:latest
 ```
+
+## 📖 Referencias y créditos
+
+Para profundizar, recomendamos el artículo de Herberto Graça
+[DDD, Hexagonal, Onion, Clean, CQRS, … How I put it all together](https://herbertograca.com/2017/11/16/explicit-architecture-01-ddd-hexagonal-onion-clean-cqrs-how-i-put-it-all-together/),
+que incluye su infografía *Explicit Architecture* (con ayuda de Francesco Mastrogiacomo).
+
+> La infografía **no** se incluye en este repositorio porque el sitio original no declara una licencia de reutilización. Todos los derechos pertenecen a su autor. Los diagramas de `docs/diagramas/` son propios de este proyecto.
 
 ## 🤝 Contribuir
 
