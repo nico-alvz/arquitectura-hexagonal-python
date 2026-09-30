@@ -1,26 +1,12 @@
-"""Raíz de composición: el único lugar donde se "conectan los cables".
+"""Raíz de composición de la API: el único lugar donde se "conectan los cables".
 
-Aquí se elige qué adaptador de salida usar, se inyecta en el servicio y el servicio
-en el adaptador de entrada. Para cambiar de base de datos solo se toca este archivo.
+La elección de adaptadores está en `composicion.py`. Para cambiar de base de datos
+solo se toca allí (o se define la variable de entorno `REPOSITORIO`).
 
-Variable de entorno:
-    REPOSITORIO   "sqlite" (por defecto) o "memoria"
-    RUTA_DB       ruta del archivo SQLite (por defecto "tareas.db")
+Ejecución: uvicorn tareas.principal:app
 """
 
-import os
-
 from tareas.adaptadores.entrada.api_fastapi import crear_app
-from tareas.adaptadores.salida.repositorio_memoria import RepositorioMemoria
-from tareas.adaptadores.salida.repositorio_sqlite import RepositorioSQLite
-from tareas.aplicacion.puertos import RepositorioTareas
-from tareas.aplicacion.servicio_tareas import ServicioTareas
+from tareas.composicion import construir_servicio
 
-
-def construir_repositorio() -> RepositorioTareas:
-    if os.getenv("REPOSITORIO", "sqlite") == "memoria":
-        return RepositorioMemoria()
-    return RepositorioSQLite(os.getenv("RUTA_DB", "tareas.db"))
-
-
-app = crear_app(ServicioTareas(construir_repositorio()))
+app = crear_app(construir_servicio())
