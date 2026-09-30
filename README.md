@@ -184,7 +184,11 @@ Para profundizar, recomendamos el artículo de Herberto Graça
 [DDD, Hexagonal, Onion, Clean, CQRS, … How I put it all together](https://herbertograca.com/2017/11/16/explicit-architecture-01-ddd-hexagonal-onion-clean-cqrs-how-i-put-it-all-together/),
 que incluye su infografía *Explicit Architecture* (con ayuda de Francesco Mastrogiacomo).
 
-> La infografía **no** se incluye en este repositorio porque el sitio original no declara una licencia de reutilización. Todos los derechos pertenecen a su autor. Los diagramas de `docs/diagramas/` son propios de este proyecto.
+[![Explicit Architecture — Herberto Graça](https://herbertograca.com/wp-content/uploads/2018/11/100-explicit-architecture-svg.png)](https://herbertograca.com/2017/11/16/explicit-architecture-01-ddd-hexagonal-onion-clean-cqrs-how-i-put-it-all-together/)
+
+*Imagen: «Explicit Architecture» © Herberto Graça, tomada de [herbertograca.com](https://herbertograca.com). Se muestra enlazada desde su sitio original, no se almacena en este repositorio, y todos los derechos pertenecen a su autor.*
+
+> Los diagramas de `docs/diagramas/` son propios de este proyecto.
 
 ## 🤝 Contribuir
 
