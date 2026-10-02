@@ -8,8 +8,28 @@ Una aplicación de gestión de tareas que muestra cómo separar las reglas de ne
 
 El código y las pruebas permiten seguir una operación de principio a fin: desde la entrada del usuario hasta el dominio, pasando por los contratos que conectan la aplicación con sus adaptadores.
 
+## Glosario rápido
+
+| Término | Significado | Ejemplo aquí |
+|---|---|---|
+| **Arquitectura hexagonal** | Forma de organizar una aplicación para que el negocio se comunique con el exterior mediante puertos y adaptadores | El mismo núcleo funciona con API o CLI y distintos almacenamientos |
+| **Núcleo** | El dominio y los casos de uso de la aplicación | Las carpetas `dominio/` y `aplicacion/` |
+| **Dominio y entidad** | El dominio reúne los conceptos y reglas del negocio; una entidad representa un elemento con identidad | `Tarea`, su `id` y la validación del título |
+| **Caso de uso** | Una operación que la aplicación ofrece y coordina | `ServicioTareas.crear` o `actualizar` |
+| **Puerto** | Contrato que define cómo interactuar con el núcleo: qué se puede solicitar o qué necesita este del exterior | Métodos públicos del servicio y contratos como `RepositorioTareas` |
+| **Adaptador** | Código que conecta una tecnología concreta con un puerto | FastAPI traduce peticiones; `RepositorioSQLite` guarda mediante SQL |
+| **Inversión de dependencias** | La lógica de aplicación depende de contratos que también cumplen las implementaciones externas | Servicio y repositorios concretos dependen de `RepositorioTareas` |
+| **Inyección de dependencias** | Entregar a un objeto sus colaboradores al construirlo, en vez de crearlos dentro de él | `ServicioTareas(RepositorioMemoria())` |
+| **Raíz de composición** | Lugar de arranque donde se eligen y conectan los objetos | `principal.py` y `principal_cli.py`, con ayuda de `composicion.py` |
+| **Persistencia y repositorio** | Persistir es conservar datos; un repositorio ofrece operaciones para guardarlos y consultarlos | SQLite y JSON conservan archivos; memoria solo conserva datos durante la ejecución |
+| **API, HTTP y CLI** | API es una interfaz de programación; HTTP es el protocolo usado por la API web; CLI es una interfaz por terminal | `POST /tareas` y `python -m tareas.principal_cli crear` |
+| **CRUD** | Crear, leer, actualizar y eliminar datos (*Create, Read, Update, Delete*) | Las operaciones de gestión de tareas |
+| **Prueba de contrato** | Comprobación de comportamientos que deben compartir las implementaciones de un puerto | La misma batería de pruebas para memoria, SQLite y JSON |
+| **Patrón de diseño** | Solución recurrente para organizar la colaboración entre clases u objetos | [Adapter, Strategy y Bridge](#patrones-relacionados-en-refactoring-guru), como lecturas complementarias |
+
 ## 📚 Tabla de contenidos
 
+- [Glosario rápido](#glosario-rápido)
 - [¿Qué es la arquitectura hexagonal?](#-qué-es-la-arquitectura-hexagonal)
 - [Diagramas](#-diagramas)
 - [Estructura del proyecto](#-estructura-del-proyecto)
@@ -21,6 +41,7 @@ El código y las pruebas permiten seguir una operación de principio a fin: desd
 - [Pruebas](#-pruebas)
 - [CI/CD](#-cicd)
 - [Referencias y créditos](#-referencias-y-créditos)
+- [Patrones relacionados en Refactoring Guru](#patrones-relacionados-en-refactoring-guru)
 - [Contribuir](#-contribuir)
 - [Licencia](#-licencia)
 
@@ -231,6 +252,20 @@ podman run --rm -p 8000:8000 ghcr.io/nico-alvz/arquitectura-hexagonal-python:lat
 ```
 
 ## 📖 Referencias y créditos
+
+### Patrones relacionados en Refactoring Guru
+
+El [catálogo de Refactoring Guru en español](https://refactoring.guru/es/design-patterns/catalog) explica patrones de diseño creacionales, estructurales y de comportamiento. La arquitectura hexagonal organiza las dependencias de la aplicación completa; estos patrones ayudan a estudiar colaboraciones concretas entre objetos. Las siguientes relaciones con el proyecto sirven como comparación didáctica:
+
+| Lectura | Qué explica | Relación con este ejemplo |
+|---|---|---|
+| [Adapter / Adaptador](https://refactoring.guru/es/design-patterns/adapter) · [Ejemplo en Python](https://refactoring.guru/es/design-patterns/adapter/python/example) | Cómo traducir entre interfaces incompatibles | Ayuda a entender cómo un repositorio traduce operaciones del puerto a una tecnología. El término «adaptador» en arquitectura hexagonal tiene un alcance más amplio y no exige reproducir la estructura del patrón Adapter |
+| [Strategy / Estrategia](https://refactoring.guru/es/design-patterns/strategy) | Cómo encapsular alternativas de un algoritmo detrás de una interfaz común | Permite comparar la idea de delegar en implementaciones intercambiables con la selección de repositorios. Aquí las alternativas son mecanismos de almacenamiento, y se eligen al construir el servicio |
+| [Bridge / Puente](https://refactoring.guru/es/design-patterns/bridge) | Cómo separar abstracción e implementación para que evolucionen independientemente | Sirve para estudiar la separación de responsabilidades mediante composición. Este proyecto no implementa las dos jerarquías de Bridge; su separación central es entre núcleo y adaptadores |
+
+Puedes empezar por Adapter y su ejemplo en Python, y después volver a `RepositorioTareas` y `RepositorioSQLite` para comparar sus responsabilidades. Para profundizar en la organización arquitectónica, continúa con la referencia siguiente.
+
+### Arquitectura y organización del dominio
 
 Para profundizar, recomendamos el artículo de Herberto Graça
 [DDD, Hexagonal, Onion, Clean, CQRS, … How I put it all together](https://herbertograca.com/2017/11/16/explicit-architecture-01-ddd-hexagonal-onion-clean-cqrs-how-i-put-it-all-together/),
