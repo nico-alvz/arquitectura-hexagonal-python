@@ -36,7 +36,9 @@ flowchart LR
 
 ## ¿Qué es un contrato?
 
-Un **puerto** es una clase abstracta (`ABC`) con métodos `@abstractmethod`. Es un contrato: quien lo implemente **está obligado** a ofrecer esos métodos. Python te avisa si olvidas alguno:
+Un **puerto** define un contrato de interacción con el núcleo. En este proyecto, los puertos de salida se expresan como clases abstractas (`ABC`) con métodos `@abstractmethod`; el puerto de entrada está representado por los métodos públicos de `ServicioTareas`.
+
+Python impide instanciar un adaptador de salida si le faltan métodos abstractos. El comportamiento esperado se comprueba con pruebas de contrato:
 
 ```python
 class Incompleto(RepositorioTareas):
@@ -56,7 +58,7 @@ Los contratos viven en [`aplicacion/puertos.py`](../src/tareas/aplicacion/puerto
 
 1. Crea `adaptadores/salida/mi_repositorio.py` con una clase que herede de `RepositorioTareas`.
 2. Implementa `guardar`, `obtener`, `listar` y `eliminar`.
-3. **Agrégalo a las pruebas de contrato:** en [`tests/test_contrato_repositorio.py`](../tests/test_contrato_repositorio.py), suma tu opción a `params` y a la fixture. Si pasa esas pruebas, se comporta igual que los demás.
+3. **Agrégalo a las pruebas de contrato:** en [`tests/test_contrato_repositorio.py`](../tests/test_contrato_repositorio.py), suma tu opción a `params` y a la fixture. Estas pruebas verifican los comportamientos compartidos cubiertos por la batería; agrega casos cuando amplíes el contrato.
 4. Actívalo en [`composicion.py`](../src/tareas/composicion.py) (por ejemplo, con un nuevo valor de `REPOSITORIO`).
 
 No se modifica ni el dominio ni el servicio ni la API.
@@ -83,10 +85,12 @@ No se modifica ni el dominio ni el servicio ni la API.
 
 **Ejemplo real:** [`cli.py`](../src/tareas/adaptadores/entrada/cli.py), una línea de comandos que reutiliza `ServicioTareas`.
 
+Ejecuta desde la raíz del repositorio, con el entorno de Python preparado. Usa el `id` devuelto por `crear` en el comando `completar` (el ejemplo supone `1`).
+
 ```bash
-REPOSITORIO=json python -m tareas.principal_cli crear "Mi tarea"
-REPOSITORIO=json python -m tareas.principal_cli completar 1
-REPOSITORIO=json python -m tareas.principal_cli listar
+PYTHONPATH=src REPOSITORIO=json python -m tareas.principal_cli crear "Mi tarea"
+PYTHONPATH=src REPOSITORIO=json python -m tareas.principal_cli completar 1
+PYTHONPATH=src REPOSITORIO=json python -m tareas.principal_cli listar
 ```
 
 Los adaptadores de entrada reciben el servicio ya construido y solo traducen: entrada del usuario → llamada al servicio → salida.
@@ -107,3 +111,5 @@ Ejemplo: "listar solo las pendientes".
 - [ ] ¿El adaptador nuevo cumple todo el contrato del puerto?
 - [ ] ¿Agregué mis pruebas (y las de contrato, si es un repositorio)?
 - [ ] ¿Comenté el código en español y actualicé el README si hacía falta?
+
+Para practicar antes de agregar una implementación, sigue el [recorrido guiado](recorrido-guiado.md).
